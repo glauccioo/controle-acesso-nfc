@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 router = APIRouter(tags=["Pessoas"])
@@ -26,6 +26,17 @@ people = [
 @router.get("/people", response_model=list[Person])
 def list_people():
     return people
+
+@router.get("/people/{person_id}", response_model=Person)
+def get_person(person_id: int):
+    for person in people:
+        if person.id == person_id:
+            return person
+
+    raise HTTPException(
+        status_code=404,
+        detail="Pessoa não encontrada"
+    )
 
 
 @router.post(
