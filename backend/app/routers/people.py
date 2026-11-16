@@ -16,6 +16,10 @@ class PersonCreate(BaseModel):
     role: str
 
 
+class PersonStatusUpdate(BaseModel):
+    active: bool
+
+
 people = [
     Person(id=1, name="Ana Souza", role="funcionaria", active=True),
     Person(id=2, name="Bruno Lima", role="funcionario", active=True),
@@ -38,6 +42,20 @@ def get_person(person_id: int):
         detail="Pessoa não encontrada"
     )
 
+@router.patch("/people/{person_id}/status", response_model=Person)
+def update_person_status(
+    person_id: int,
+    status_data: PersonStatusUpdate,
+):
+    for person in people:
+        if person.id == person_id:
+            person.active = status_data.active
+            return person
+
+    raise HTTPException(
+        status_code=404,
+        detail="Pessoa não encontrada",
+    )
 
 @router.post(
     "/people",
